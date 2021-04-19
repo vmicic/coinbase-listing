@@ -2,11 +2,19 @@
   "name": "coinbase-listing",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "src/handler.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/handler.js",
+    "deploy": "sls deploy"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.888.0",
+    "eslint": "^7.24.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "serverless": "^2.35.0"
   },
   "repository": {
     "type": "git",
@@ -17,13 +25,5 @@
   "bugs": {
     "url": "https://github.com/vmicic/coinbase-listing/issues"
   },
-  "homepage": "https://github.com/vmicic/coinbase-listing#readme",
-  "dependencies": {
-    "axios": "^0.21.1",
-    "dotenv": "^8.2.0"
-  },
-  "devDependencies": {
-    "eslint": "^7.24.0",
-    "eslint-config-airbnb-base": "^14.2.1"
-  }
+  "homepage": "https://github.com/vmicic/coinbase-listing#readme"
 }
