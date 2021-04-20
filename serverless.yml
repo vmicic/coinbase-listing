@@ -1,5 +1,9 @@
+plugins:
+  - serverless-offline
+
 service: coinbase-listing
-frameworkVersion: "2"
+frameworkVersion: '2'
+useDotenv: true
 
 provider:
   name: aws
@@ -18,13 +22,16 @@ provider:
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
-          Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DATA_TABLE}"
+          Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DATA_TABLE}'
 
 functions:
   main:
     handler: src/handler.main
     events:
-     - schedule: rate(10 minutes)
+      - httpApi:
+          path: /api/checkListing
+          method: GET
+      - schedule: rate(10 minutes)
 
 resources:
   Resources:
