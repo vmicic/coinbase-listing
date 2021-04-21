@@ -32,6 +32,12 @@ functions:
           path: /api/checkListing
           method: GET
       - schedule: rate(10 minutes)
+  createOrderBinance:
+    handler: src/binanceOrder.buyWrapper
+    events:
+      - httpApi:
+          path: /api/buy
+          method: POST
 
 resources:
   Resources:

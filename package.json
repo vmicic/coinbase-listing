@@ -8,7 +8,9 @@
     "deploy": "sls deploy"
   },
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "aws-sdk": "^2.888.0",

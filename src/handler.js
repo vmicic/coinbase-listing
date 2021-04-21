@@ -5,6 +5,7 @@ const axios = require('axios');
 // since aws-sdk is available in lambda envronment
 // eslint-disable-next-line import/no-extraneous-dependencies
 const AWS = require('aws-sdk');
+const { buy } = require('./binanceOrder');
 
 const client = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
@@ -120,7 +121,19 @@ const alertLaunching = async (coins) => {
 const main = async () => {
   const coins = await detectListing();
   if (coins.length > 0) {
-    // place to handle binance :)
+    coins.forEach((coin) => {
+      const event = {
+        path: '/api/buy',
+        queryStringParameters: {
+          coin,
+          with: 'USDT',
+          type: 'MARKET',
+          forQuantity: '15',
+        },
+      };
+      // rethink this
+      buy(event);
+    });
     await alertLaunching(coins);
   }
 };
