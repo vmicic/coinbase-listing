@@ -105,24 +105,35 @@ const detectListing = async () => {
   return coins;
 };
 
+const buyCoins = (coins) => {
+  coins.forEach((coin) => {
+    const event = {
+      path: '/api/buy',
+      queryStringParameters: {
+        coin,
+        coinWith: 'USDT',
+        type: 'MARKET',
+        forQuantity: '15',
+      },
+    };
+    // rethink this
+    buyWrapper(event);
+  });
+};
+
 const main = async () => {
   const coins = await detectListing();
   if (coins.length > 0) {
-    coins.forEach((coin) => {
-      const event = {
-        path: '/api/buy',
-        queryStringParameters: {
-          coin,
-          coinWith: 'USDT',
-          type: 'MARKET',
-          forQuantity: '15',
-        },
-      };
-      // rethink this
-      buyWrapper(event);
-    });
     await sendMessageDiscord(`${coins.join(' ')} launched on Coinbase :)`, 'Coinbase listing bot');
+    buyCoins(coins);
   }
 };
 
-module.exports = { main };
+module.exports = {
+  main,
+  getTitlesFromBody,
+  getTitlesFromApi,
+  getNewTitles,
+  isTitleLaunching,
+  getLaunchingCoins,
+};

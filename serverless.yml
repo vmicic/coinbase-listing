@@ -26,12 +26,12 @@ provider:
 
 functions:
   main:
-    handler: src/handler.main
+    handler: src/coinbaseListing.main
     events:
       - httpApi:
           path: /api/checkListing
           method: GET
-      - schedule: rate(10 minutes)
+      - schedule: rate(5 minutes)
   createOrderBinance:
     handler: src/binanceOrder.buyWrapper
     events:
