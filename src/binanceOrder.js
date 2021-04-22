@@ -2,13 +2,11 @@ const axios = require('axios');
 const crypto = require('crypto');
 require('dotenv').config();
 
-const { errorResponse, errorResponseFromError } = require('../utils/responseUtil');
-const { errorResponseFromAxios } = require('../errors/axiosErrors');
-const { BadRequestError } = require('../errors/BadRequestError');
+const { sendMessageDiscord } = require('./discord');
+const { getErrorResponse } = require('./errors/handleError');
+const { BadRequestError } = require('./errors/BadRequestError');
 
 const BINANCE_BASE_URL = 'https://api.binance.com';
-// prettier-ignore
-const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/833780553488400404/vA6mQgmHhJuXIiW6WTb8PxA-No9edieuuoB4bGbzOPeAEu7Qj5Nb-OqIyZsU-j2f2UeO';
 const { API_KEY, API_SECRET } = process.env;
 
 const buildSignature = (data) => crypto.createHmac('sha256', API_SECRET).update(data).digest('hex');
@@ -50,24 +48,12 @@ const getNumberOfDecimalPoints = async (symbol) => {
   throw new BadRequestError(400, 'Unexpected value for LOT_SIZE');
 };
 
-const sendMessageDiscord = (content) => {
-  const message = {
-    content,
-    avatar: '',
-    username: 'Binance buy bot',
-  };
-
-  return axios.post(DISCORD_WEBHOOK, JSON.stringify(message), {
-    headers: { 'Content-type': 'application/json' },
-  });
-};
-
 const getResponse = async (orderResponse, dataForResponse) => {
   const { coin, coinWith } = dataForResponse;
   const { data } = orderResponse;
 
   const messageContent = `Bought ${data.origQty} ${coin} with ${data.cummulativeQuoteQty} ${coinWith}.`;
-  await sendMessageDiscord(messageContent);
+  await sendMessageDiscord(messageContent, 'Binance buy bot');
 
   const body = {
     msg: `Bought ${data.origQty} ${coin} with ${data.cummulativeQuoteQty} ${coinWith}`,
@@ -84,7 +70,7 @@ const buyMarketPrice = async (event) => {
   const symbol = `${coin.toUpperCase()}${coinWith.toUpperCase()}`;
   const pricePerCoin = await getCurrentPrice(symbol);
 
-  // put lot size to db, it needs decent ammount of time to find it, because response is big
+  // put lot_size to db, it needs decent ammount of time to find it, because response is big
   const decimalPoints = await getNumberOfDecimalPoints(symbol);
   const quantity = (forQuantity / pricePerCoin).toFixed(decimalPoints);
 
@@ -118,16 +104,7 @@ const buyWrapper = async (event) => {
   try {
     return await buy(event);
   } catch (error) {
-    if (error.isAxiosError === true) {
-      await sendMessageDiscord('Error while buying.');
-      return errorResponseFromAxios(error);
-    }
-    if (error.statusCode !== undefined) {
-      return errorResponseFromError(error);
-    }
-    return errorResponse(500, 'Unexpected error happened. Please try again.', {
-      'Content-type': 'text/plain',
-    });
+    return getErrorResponse(error);
   }
 };
 

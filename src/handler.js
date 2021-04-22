@@ -5,14 +5,12 @@ const axios = require('axios');
 // since aws-sdk is available in lambda envronment
 // eslint-disable-next-line import/no-extraneous-dependencies
 const AWS = require('aws-sdk');
-const { buy } = require('./binanceOrder');
+const { buyWrapper } = require('./binanceOrder');
+const { sendMessageDiscord } = require('./discord');
 
 const client = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
 const POSTS_API_URI = 'https://medium.com/_/api/collections/c114225aeaf7/stream';
-// prettier-ignore
-const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/833780553488400404/vA6mQgmHhJuXIiW6WTb8PxA-No9edieuuoB4bGbzOPeAEu7Qj5Nb-OqIyZsU-j2f2UeO';
-
 const { DATA_TABLE } = process.env;
 
 const getTitlesFromBody = (body) => {
@@ -107,17 +105,6 @@ const detectListing = async () => {
   return coins;
 };
 
-const alertLaunching = async (coins) => {
-  const data = {
-    content: `${coins.join(' ')} launched on Coinbase :)`,
-    avatar: '',
-    username: 'Coinbase listing bot',
-  };
-  await axios.post(DISCORD_WEBHOOK, JSON.stringify(data), {
-    headers: { 'Content-type': 'application/json' },
-  });
-};
-
 const main = async () => {
   const coins = await detectListing();
   if (coins.length > 0) {
@@ -126,15 +113,15 @@ const main = async () => {
         path: '/api/buy',
         queryStringParameters: {
           coin,
-          with: 'USDT',
+          coinWith: 'USDT',
           type: 'MARKET',
           forQuantity: '15',
         },
       };
       // rethink this
-      buy(event);
+      buyWrapper(event);
     });
-    await alertLaunching(coins);
+    await sendMessageDiscord(`${coins.join(' ')} launched on Coinbase :)`, 'Coinbase listing bot');
   }
 };
 
