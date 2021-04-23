@@ -30,6 +30,8 @@ functions:
     environment:
       API_KEY: ${env:API_KEY}
       API_SECRET: ${env:API_SECRET}
+      COIN_WITH: ${env:COIN_WITH}
+      FOR_QUANTITY: ${env:FOR_QUANTITY}
     handler: src/coinbaseListing.main
     events:
       - httpApi:

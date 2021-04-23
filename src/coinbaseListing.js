@@ -11,7 +11,7 @@ const { sendMessageDiscord } = require('./discord');
 const client = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
 const POSTS_API_URI = 'https://medium.com/_/api/collections/c114225aeaf7/stream';
-const { DATA_TABLE } = process.env;
+const { DATA_TABLE, COIN_WITH, FOR_QUANTITY } = process.env;
 
 const getTitlesFromBody = (body) => {
   const posts = { ...body.payload.references.Post };
@@ -112,9 +112,9 @@ const buyCoins = (coins) => {
       path: '/api/buy',
       queryStringParameters: {
         coin,
-        coinWith: 'USDT',
+        coinWith: COIN_WITH,
         type: 'MARKET',
-        forQuantity: '15',
+        forQuantity: FOR_QUANTITY,
       },
     };
     // rethink this
