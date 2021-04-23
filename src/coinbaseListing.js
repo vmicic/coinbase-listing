@@ -106,6 +106,7 @@ const detectListing = async () => {
 };
 
 const buyCoins = (coins) => {
+  let buyPromises = [];
   coins.forEach((coin) => {
     const event = {
       path: '/api/buy',
@@ -117,15 +118,17 @@ const buyCoins = (coins) => {
       },
     };
     // rethink this
-    buyWrapper(event);
+    buyPromises = [...buyPromises, buyWrapper(event)];
   });
+
+  return buyPromises;
 };
 
 const main = async () => {
   const coins = await detectListing();
   if (coins.length > 0) {
     await sendMessageDiscord(`${coins.join(' ')} launched on Coinbase :)`, 'Coinbase listing bot');
-    buyCoins(coins);
+    await Promise.allSettled(buyCoins(coins));
   }
 };
 

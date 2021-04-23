@@ -1,9 +1,10 @@
 plugins:
   - serverless-offline
+  - serverless-dotenv-plugin
 
 service: coinbase-listing
-frameworkVersion: '2'
 useDotenv: true
+frameworkVersion: '2'
 
 provider:
   name: aws
@@ -26,18 +27,15 @@ provider:
 
 functions:
   main:
+    environment:
+      API_KEY: ${env:API_KEY}
+      API_SECRET: ${env:API_SECRET}
     handler: src/coinbaseListing.main
     events:
       - httpApi:
           path: /api/checkListing
           method: GET
-      - schedule: rate(5 minutes)
-  createOrderBinance:
-    handler: src/binanceOrder.buyWrapper
-    events:
-      - httpApi:
-          path: /api/buy
-          method: POST
+      - schedule: rate(2 minutes)
 
 resources:
   Resources:
