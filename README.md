@@ -1,5 +1,8 @@
 # coinbase-listing
 
+## Description
+
+Serverless function that automatically buys new Coinbase listings on Binance.
 
 ## Setup
 
